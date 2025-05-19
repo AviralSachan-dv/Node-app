@@ -5,10 +5,25 @@ const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server);
+
+// Configure Socket.IO with CORS and other production settings
+const io = socketIO(server, {
+  cors: {
+    origin: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "*",
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+  transports: ['websocket', 'polling'],
+  path: '/api/socketio' // Add this for Vercel
+});
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
+
+// Add a catch-all route to serve index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 io.on("connection", (socket) => {
   console.log("A user connected");
@@ -30,8 +45,14 @@ io.on("connection", (socket) => {
   });
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+// For Vercel serverless deployment
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
+  const HOST = process.env.HOST || '0.0.0.0';
+  server.listen(PORT, HOST, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Export the Express API
+module.exports = app;

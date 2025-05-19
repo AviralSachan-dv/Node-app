@@ -1,5 +1,40 @@
-const socket = io();
-const username = prompt("Enter your name:").trim();
+// Initialize Socket.IO with proper configuration for Vercel
+const socket = io({
+  path: '/api/socketio',
+  transports: ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
+  forceNew: true
+});
+
+// Handle connection events
+socket.on('connect', () => {
+  console.log('Connected to server');
+  // Only prompt for username after successful connection
+  if (!window.username) {
+    window.username = prompt("Enter your name:").trim();
+    if (window.username) {
+      socket.emit('new user', window.username);
+    }
+  }
+});
+
+socket.on('connect_error', (error) => {
+  console.error('Connection error:', error);
+  alert('Unable to connect to the chat server. Please try again later.');
+});
+
+socket.on('disconnect', (reason) => {
+  console.log('Disconnected:', reason);
+  if (reason === 'io server disconnect') {
+    // Server initiated disconnect, try to reconnect
+    socket.connect();
+  }
+});
+
+// Use the stored username
+const username = window.username;
 
 const form = document.getElementById('form');
 const input = document.getElementById('input');
