@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>V-Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    /* Ensure emoji popup is absolutely positioned and hidden initially */
+    #emoji-popup.hidden {
+      display: none;
+    }
+    #emoji-popup {
+      position: absolute;
+      bottom: 60px; /* Adjust according to your layout */
+      left: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    #form {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <header class="chat-header">
+      <h1>V-Chat</h1>
+      <p class="tagline">Connect instantly. Professionally.</p>
+    </header>
+
+    <div id="message-container">
+      <div id="watermark">V-Chat</div>
+      <ul id="messages"></ul>
+    </div>
+
+    <form id="form" autocomplete="off">
+      <!-- Emoji Button on left -->
+      <button type="button" id="emoji-toggle" class="emoji-btn">😀</button>
+
+      <!-- Input -->
+      <input id="input" placeholder="Type your message..." />
+
+      <!-- Camera Button -->
+      <button type="button" id="camera-btn" title="Attach File">📎</button>
+
+      <!-- Hidden file input -->
+      <input type="file" id="image-input" accept="image/*" style="display:none" />
+
+      <!-- Send Button -->
+      <button type="submit">➤</button>
+
+      <!-- Emoji Popup outside flow but inside form container -->
+      <div id="emoji-popup" class="hidden">
+        <button class="emoji-btn">😀</button>
+        <button class="emoji-btn">😂</button>
+        <button class="emoji-btn">😍</button>
+        <button class="emoji-btn">😎</button>
+        <button class="emoji-btn">😡</button>
+        <button class="emoji-btn">👍</button>
+      </div>
+    </form>
+  </div>
+
+  <audio id="notifSound" src="/sounds/notify.mp3" preload="auto"></audio>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/client.js"></script>
+</body>
+</html>
