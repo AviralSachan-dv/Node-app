@@ -1,40 +1,5 @@
-// Initialize Socket.IO with proper configuration for Vercel
-const socket = io({
-  path: '/api/socketio',
-  transports: ['websocket', 'polling'],
-  reconnection: true,
-  reconnectionAttempts: 5,
-  reconnectionDelay: 1000,
-  forceNew: true
-});
-
-// Handle connection events
-socket.on('connect', () => {
-  console.log('Connected to server');
-  // Only prompt for username after successful connection
-  if (!window.username) {
-    window.username = prompt("Enter your name:").trim();
-    if (window.username) {
-      socket.emit('new user', window.username);
-    }
-  }
-});
-
-socket.on('connect_error', (error) => {
-  console.error('Connection error:', error);
-  alert('Unable to connect to the chat server. Please try again later.');
-});
-
-socket.on('disconnect', (reason) => {
-  console.log('Disconnected:', reason);
-  if (reason === 'io server disconnect') {
-    // Server initiated disconnect, try to reconnect
-    socket.connect();
-  }
-});
-
-// Use the stored username
-const username = window.username;
+const socket = io();
+const username = prompt("Enter your name:").trim();
 
 const form = document.getElementById('form');
 const input = document.getElementById('input');
@@ -82,9 +47,7 @@ socket.on('chat message', (msg) => {
 socket.on('user joined', (msg) => {
   const item = document.createElement('li');
   item.textContent = msg;
-  item.style.textAlign = 'center';
-  item.style.color = '#666';
-  item.style.fontStyle = 'italic';
+  item.className = 'user-joined-notification';
   messages.appendChild(item);
   scrollToBottom();
   notifSound.play();
@@ -161,47 +124,17 @@ function createCameraUI() {
 
   cameraContainer = document.createElement('div');
   cameraContainer.id = 'camera-container';
-  cameraContainer.style.position = 'fixed';
-  cameraContainer.style.top = '50%';
-  cameraContainer.style.left = '50%';
-  cameraContainer.style.transform = 'translate(-50%, -50%)';
-  cameraContainer.style.background = '#fff';
-  cameraContainer.style.border = '2px solid #2196f3';
-  cameraContainer.style.borderRadius = '12px';
-  cameraContainer.style.padding = '10px';
-  cameraContainer.style.zIndex = '1000';
-  cameraContainer.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-  cameraContainer.style.display = 'flex';
-  cameraContainer.style.flexDirection = 'column';
-  cameraContainer.style.alignItems = 'center';
 
   videoElem = document.createElement('video');
   videoElem.autoplay = true;
-  videoElem.style.width = '300px';
-  videoElem.style.height = 'auto';
-  videoElem.style.borderRadius = '10px';
   cameraContainer.appendChild(videoElem);
 
   captureBtn = document.createElement('button');
   captureBtn.textContent = 'Capture Photo';
-  captureBtn.style.marginTop = '10px';
-  captureBtn.style.padding = '8px 16px';
-  captureBtn.style.backgroundColor = '#2196f3';
-  captureBtn.style.color = 'white';
-  captureBtn.style.border = 'none';
-  captureBtn.style.borderRadius = '8px';
-  captureBtn.style.cursor = 'pointer';
 
   // Cancel button
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
-  cancelBtn.style.marginTop = '8px';
-  cancelBtn.style.padding = '6px 14px';
-  cancelBtn.style.backgroundColor = '#f44336';
-  cancelBtn.style.color = 'white';
-  cancelBtn.style.border = 'none';
-  cancelBtn.style.borderRadius = '8px';
-  cancelBtn.style.cursor = 'pointer';
 
   cameraContainer.appendChild(captureBtn);
   cameraContainer.appendChild(cancelBtn);
@@ -269,15 +202,6 @@ openCameraBtn.type = 'button';
 openCameraBtn.id = 'open-camera-btn';
 openCameraBtn.title = 'Open Camera';
 openCameraBtn.innerHTML = '📸';
-openCameraBtn.style.fontSize = '24px';
-openCameraBtn.style.background = 'none';
-openCameraBtn.style.border = 'none';
-openCameraBtn.style.cursor = 'pointer';
-openCameraBtn.style.marginLeft = '8px';
-openCameraBtn.style.userSelect = 'none';
-openCameraBtn.style.transition = 'transform 0.2s';
-openCameraBtn.addEventListener('mouseenter', () => openCameraBtn.style.transform = 'scale(1.3)');
-openCameraBtn.addEventListener('mouseleave', () => openCameraBtn.style.transform = 'scale(1)');
 
 // Insert it right after the cameraBtn
 cameraBtn.insertAdjacentElement('afterend', openCameraBtn);
@@ -298,10 +222,7 @@ function createMessageElement(msg) {
 
     const img = document.createElement('img');
     img.src = msg.image;
-    img.style.maxWidth = '200px';
-    img.style.borderRadius = '12px';
-    img.style.display = 'block';
-    img.style.marginTop = '5px';
+    img.className = 'message-image';
 
     item.appendChild(userSpan);
     item.appendChild(img);
